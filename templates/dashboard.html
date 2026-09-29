@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Hello, {{ user['username'] }}</h1>
+<p>You are logged in as <strong>{{ user['email'] }}</strong>. Your session expires after 30 minutes.</p>
+
+<h2>Two-factor authentication</h2>
+{% if user['totp_enabled'] %}
+  <p class="status on">Enabled</p>
+  <form method="post" action="{{ url_for('disable_2fa') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>Password
+      <input name="password" type="password" required autocomplete="current-password">
+    </label>
+    <label>Current authentication code
+      <input name="code" inputmode="numeric" maxlength="7" required autocomplete="one-time-code">
+    </label>
+    <button type="submit" class="danger">Disable 2FA</button>
+  </form>
+{% else %}
+  <p class="status off">Not enabled</p>
+  <p>Add a second step to your login with an authenticator app such as Google Authenticator, Authy or 1Password.</p>
+  <a class="button" href="{{ url_for('setup_2fa') }}">Set up 2FA</a>
+{% endif %}
+
+<form method="post" action="{{ url_for('logout') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <button type="submit" class="secondary">Log out</button>
+</form>
+{% endblock %}
